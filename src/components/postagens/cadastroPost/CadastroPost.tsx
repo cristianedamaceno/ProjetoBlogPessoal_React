@@ -3,19 +3,33 @@ import { Container, Typography, TextField, Button, Select, InputLabel, MenuItem,
 import './CadastroPost.css';
 import { useHistory, useParams } from 'react-router-dom';
 import Tema from '../../../models/Tema';
-import useLocalStorage from 'react-use-localstorage';
 import Postagem from '../../../models/Postagem';
 import { busca, buscaId, post, put } from '../../../services/Service';
+import { useSelector } from 'react-redux';
+import { TokenState } from '../../../store/tokens/TokensReducer';
+import { toast } from "react-toastify";
+
 
 function CadastroPost() {
 	let history = useHistory();
 	const { id } = useParams<{ id: string }>();
 	const [temas, setTemas] = useState<Tema[]>([])
-	const [token, setToken] = useLocalStorage('token');
+	const token = useSelector<TokenState, TokenState["tokens"]>(
+        (state) => state.tokens
+    );
 
 	useEffect(() => {
 		if (token == "") {
-			alert("Você precisa estar logado")
+			toast.error("Você precisa estar logado!!", {
+				position: "top-right",
+				autoClose: 2000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: false,
+				draggable: false,
+				theme: "colored",
+				progress: undefined
+			});
 			history.push("/login")
 
 		}
@@ -25,6 +39,7 @@ function CadastroPost() {
 		{
 			id: 0,
 			descricao: ''
+            
 		})
 	const [postagem, setPostagem] = useState<Postagem>({
 		id: 0,
@@ -48,7 +63,7 @@ function CadastroPost() {
 	}, [id])
 
 	async function getTemas() {
-		await busca("/tema", setTemas, {
+		await busca("/temas", setTemas, {
 			headers: {
 				'Authorization': token
 			}
@@ -82,21 +97,39 @@ function CadastroPost() {
 					'Authorization': token
 				}
 			})
-			alert('Postagem atualizada com sucesso');
+			toast.success("Postagem atualizada com sucesso xuxu!!", {
+				position: "top-right",
+				autoClose: 2000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: false,
+				draggable: false,
+				theme: "colored",
+				progress: undefined
+			});
 		} else {
 			post(`/postagens`, postagem, setPostagem, {
 				headers: {
 					'Authorization': token
 				}
 			})
-			alert('Postagem cadastrada com sucesso');
+			toast.success("Postagem Cadastrada com sucesso xuxu!!", {
+				position: "top-right",
+				autoClose: 2000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: false,
+				draggable: false,
+				theme: "colored",
+				progress: undefined
+			});
 		}
 		back()
 
 	}
 
 	function back() {
-		history.push('/posts')
+		history.push('/postagens')
 	}
 
 	return (
@@ -111,7 +144,7 @@ function CadastroPost() {
 					<Select
 						labelId="demo-simple-select-helper-label"
 						id="demo-simple-select-helper"
-						onChange={(e) => buscaId(`/tema/${e.target.value}`, setTema, {
+						onChange={(e) => buscaId(`/temas/${e.target.value}`, setTema, {
 							headers: {
 								'Authorization': token
 							}
@@ -131,4 +164,5 @@ function CadastroPost() {
 		</Container>
 	)
 }
+
 export default CadastroPost;
